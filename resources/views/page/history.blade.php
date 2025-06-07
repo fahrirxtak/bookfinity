@@ -145,78 +145,47 @@
     <!-- Script -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const borrowHistory = JSON.parse(localStorage.getItem('borrowHistory')) || [];
-            const historyList = document.getElementById('historyList');
+            // Fungsi untuk memuat dan menampilkan riwayat
+            function loadOfflineHistory() {
+                const borrowHistory = JSON.parse(localStorage.getItem('borrowHistory')) || [];
+                const historyList = document.getElementById('historyList');
 
-            if (borrowHistory.length === 0) {
-                historyList.innerHTML = '<p>Tidak ada data peminjaman.</p>';
-                return;
+                if (borrowHistory.length === 0) {
+                    historyList.innerHTML = '<p>Tidak ada data peminjaman.</p>';
+                    return;
+                }
+
+                let html = '<div class="row">';
+                borrowHistory.forEach(borrow => {
+                    html += `
+                <div class="col-md-10">
+                    <div class="d-flex align-items-center history-card mb-3 p-3 border rounded shadow-sm">
+                        <div class="flex-grow-1">
+                            <p class="mb-1"><strong>Nama:</strong> ${borrow.name}</p>
+                            <p class="mb-1 text-muted">Dipinjam pada: ${borrow.borrowDate}</p>
+                            <p class="mb-1 text-muted">Harus dikembalikan pada: ${borrow.returnDate}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+                });
+                html += '</div>';
+
+                historyList.innerHTML = html;
             }
 
-            let html = '<div class="row">';
-            borrowHistory.forEach(borrow => {
+            // Panggil fungsi load saat halaman siap
+            loadOfflineHistory();
 
-                html += `
-        <div class="col-md-10">
-          <div class="d-flex align-items-center history-card mb-3 p-3 border rounded shadow-sm">
-            <div class="flex-grow-1">
-              <p class="mb-1"><strong>Nama:</strong> ${borrow.name}</p>
-              <p class="mb-1 text-muted">Dipinjam pada: ${borrow.borrowDate}</p>
-              <p class="mb-1 text-muted">Harus dikembalikan pada: ${borrow.returnDate}</p>
-            </div>
-          </div>
-        </div>
-        `;
+            // Event listener tombol hapus riwayat
+            document.getElementById("clearOfflineHistoryBtn").addEventListener("click", function() {
+                if (confirm("Yakin ingin menghapus semua riwayat peminjaman offline?")) {
+                    // Hapus data dengan key yang benar
+                    localStorage.removeItem("borrowHistory");
+                    // Reload tampilan
+                    loadOfflineHistory();
+                }
             });
-            html += '</div>';
-
-            historyList.innerHTML = html;
-        });
-
-
-        // Menampilkan riwayat peminjaman offline
-        function loadOfflineHistory() {
-            const historyData = JSON.parse(localStorage.getItem('historyData')) || [];
-            const offlineHistoryContainer = document.getElementById('historyList');
-            const noHistoryDiv = document.getElementById('noHistory');
-
-            offlineHistoryContainer.innerHTML = ""; // reset container
-
-            if (historyData.length === 0) {
-                noHistoryDiv.style.display = "block";
-                return;
-            } else {
-                noHistoryDiv.style.display = "none";
-            }
-
-            historyData.forEach((borrow) => {
-                const cardHTML = `
-        <div class="col-md-12">
-          <div class="d-flex align-items-center history-card mb-3">
-            <img src="${borrow.bookImage || 'img/default-cover.jpg'}" alt="Cover buku ${borrow.bookTitle}" class="me-3">
-            <div class="flex-grow-1">
-              <h6 class="fw-bold mb-1">${borrow.bookTitle}</h6>
-              <p class="mb-1 text-muted">Dipinjam pada: ${borrow.borrowDate}</p>
-              <p class="mb-1 text-muted">Harus dikembalikan pada: ${borrow.returnDate}</p>
-              <a href="book-detail.html" class="btn btn-sm btn-outline-secondary me-2"><i class="bi bi-info-circle"></i> Detail Buku</a>
-            </div>
-          </div>
-        </div>
-      `;
-                offlineHistoryContainer.innerHTML += cardHTML;
-            });
-        }
-
-
-        // Memanggil fungsi untuk menampilkan riwayat peminjaman offline
-        loadOfflineHistory();
-
-        // Menambahkan event listener untuk tombol hapus semua riwayat peminjaman offline
-        document.getElementById("clearOfflineHistoryBtn").addEventListener("click", function() {
-            if (confirm("Yakin ingin menghapus semua riwayat peminjaman offline?")) {
-                localStorage.removeItem("historyData");
-                loadOfflineHistory(); // Memuat ulang setelah dihapus
-            }
         });
     </script>
 
